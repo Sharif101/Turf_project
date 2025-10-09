@@ -7,7 +7,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import turfPic from "../../images/turf.jpg";
-import axios from "axios";
 import {
   Select,
   SelectTrigger,
@@ -37,11 +36,11 @@ export default function BookingForm() {
     phone: "",
     email: "",
     address: "",
-    bookingAmount: "",
+    bookingAmount: "", // user-entered payment amount
     referenceNumber: "",
   });
 
-  // 90 min game + 30 min gap = 2 hr interval
+  // 🕒 Time Slots
   const morningSlots = [
     "06:00 AM - 07:30 AM",
     "08:00 AM - 09:30 AM",
@@ -54,12 +53,20 @@ export default function BookingForm() {
     "10:00 PM - 11:30 PM",
   ];
 
+  // 💰 Total amount per sport
+  const getTotalAmount = (sport) => {
+    if (sport === "Football") return 2500;
+    if (sport === "Cricket") return 2000;
+    if (sport === "Badminton") return 1500;
+    return 0;
+  };
+
   const handleBookNow = () => {
     if (!selectedSport || !selectedSlot || !date) {
-      alert("Please select sport, date, and time slot!");
+      toast.error("Please select sport, date, and time slot!");
       return;
     }
-    setStep(2); // go to next step
+    setStep(2);
   };
 
   const handleChange = (e) => {
@@ -69,16 +76,27 @@ export default function BookingForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    const totalAmount = getTotalAmount(selectedSport);
+    const paymentAmount = Number(formData.bookingAmount);
+    const dueAmount = totalAmount - paymentAmount;
+
     const bookingDetails = {
       sport: selectedSport,
       date: format(date, "PPP"),
       timeSlot: selectedSlot,
-      ...formData,
+      name: formData.name,
+      phone: formData.phone,
+      email: formData.email,
+      address: formData.address,
+      paymentAmount,
+      totalAmount,
+      dueAmount,
+      referenceNumber: formData.referenceNumber,
     };
 
     try {
       await fetch(
-        "https://script.google.com/macros/s/AKfycbySgBbrN9Cb73HTFoolJraykQAaV-h5XXSeP2a3R_gOUa3fCQR2UvZXlXC_ZE9MgiGD/exec",
+        "https://script.google.com/macros/s/AKfycbzHOO0x9Gq5nxB2Uw2CRJZuc_y9eMVOpenk5FVrqlPsC9WYu4WK03sfWWpHsbbGNu3b/exec",
         {
           method: "POST",
           mode: "no-cors",
@@ -87,7 +105,7 @@ export default function BookingForm() {
         }
       );
 
-      toast.success("Booking submitted successfully!");
+      toast.success(`Booking submitted successfully!`);
       setStep(1);
       setSelectedSlot(null);
       setSelectedSport("");
@@ -143,7 +161,7 @@ export default function BookingForm() {
         </CardContent>
       </Card>
 
-      {/* Step 1: Select Sport, Date & Slot */}
+      {/* Step 1 */}
       {step === 1 && (
         <Card>
           <CardHeader>
@@ -197,62 +215,31 @@ export default function BookingForm() {
                   <TabsTrigger value="evening">Evening</TabsTrigger>
                 </TabsList>
 
-                <TabsContent
-                  value="morning"
-                  className="grid grid-cols-2 gap-2 mt-3"
-                >
-                  {morningSlots.map((slot) => (
-                    <button
-                      key={slot}
-                      onClick={() => setSelectedSlot(slot)}
-                      className={`rounded-md border text-sm p-2 transition ${
-                        selectedSlot === slot
-                          ? "bg-green-600 text-white"
-                          : "border-gray-300 hover:bg-gray-100"
-                      }`}
-                    >
-                      {slot}
-                    </button>
-                  ))}
-                </TabsContent>
-
-                <TabsContent
-                  value="afternoon"
-                  className="grid grid-cols-2 gap-2 mt-3"
-                >
-                  {afternoonSlots.map((slot) => (
-                    <button
-                      key={slot}
-                      onClick={() => setSelectedSlot(slot)}
-                      className={`rounded-md border text-sm p-2 transition ${
-                        selectedSlot === slot
-                          ? "bg-green-600 text-white"
-                          : "border-gray-300 hover:bg-gray-100"
-                      }`}
-                    >
-                      {slot}
-                    </button>
-                  ))}
-                </TabsContent>
-
-                <TabsContent
-                  value="evening"
-                  className="grid grid-cols-2 gap-2 mt-3"
-                >
-                  {eveningSlots.map((slot) => (
-                    <button
-                      key={slot}
-                      onClick={() => setSelectedSlot(slot)}
-                      className={`rounded-md border text-sm p-2 transition ${
-                        selectedSlot === slot
-                          ? "bg-green-600 text-white"
-                          : "border-gray-300 hover:bg-gray-100"
-                      }`}
-                    >
-                      {slot}
-                    </button>
-                  ))}
-                </TabsContent>
+                {[
+                  { label: "morning", slots: morningSlots },
+                  { label: "afternoon", slots: afternoonSlots },
+                  { label: "evening", slots: eveningSlots },
+                ].map(({ label, slots }) => (
+                  <TabsContent
+                    key={label}
+                    value={label}
+                    className="grid grid-cols-2 gap-2 mt-3"
+                  >
+                    {slots.map((slot) => (
+                      <button
+                        key={slot}
+                        onClick={() => setSelectedSlot(slot)}
+                        className={`rounded-md border text-sm p-2 transition ${
+                          selectedSlot === slot
+                            ? "bg-green-600 text-white"
+                            : "border-gray-300 hover:bg-gray-100"
+                        }`}
+                      >
+                        {slot}
+                      </button>
+                    ))}
+                  </TabsContent>
+                ))}
               </Tabs>
             </div>
 
@@ -261,15 +248,18 @@ export default function BookingForm() {
               onClick={handleBookNow}
               className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white"
             >
-              {selectedSlot && date
-                ? `Book ${format(date, "MMM d")} • ${selectedSlot}`
+              {selectedSport && selectedSlot
+                ? `Book ₹${getTotalAmount(selectedSport)} • ${format(
+                    date,
+                    "MMM d"
+                  )} • ${selectedSlot}`
                 : "Book Now"}
             </Button>
           </CardContent>
         </Card>
       )}
 
-      {/* Step 2: Personal Info & Payment */}
+      {/* Step 2 */}
       {step === 2 && (
         <Card>
           <CardHeader>
@@ -277,14 +267,16 @@ export default function BookingForm() {
               Complete Your Booking
             </CardTitle>
             <p className="text-sm text-gray-600 text-center">
-              {selectedSport
-                ? `${selectedSport} • ${format(date, "PPP")} • ${selectedSlot}`
-                : ""}
+              {`${selectedSport} • ${format(date, "PPP")} • ${selectedSlot}`}
+            </p>
+            <p className="text-center text-green-600 font-medium mt-1">
+              Total Slot Amount: ₹{getTotalAmount(selectedSport)}
             </p>
           </CardHeader>
+
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="space-y-1">
+              <div>
                 <Label htmlFor="name">Full Name</Label>
                 <Input
                   id="name"
@@ -296,7 +288,7 @@ export default function BookingForm() {
                 />
               </div>
 
-              <div className="space-y-1">
+              <div>
                 <Label htmlFor="phone">Phone Number</Label>
                 <Input
                   id="phone"
@@ -308,7 +300,7 @@ export default function BookingForm() {
                 />
               </div>
 
-              <div className="space-y-1">
+              <div>
                 <Label htmlFor="email">Email Address</Label>
                 <Input
                   id="email"
@@ -321,7 +313,7 @@ export default function BookingForm() {
                 />
               </div>
 
-              <div className="space-y-1">
+              <div>
                 <Label htmlFor="address">Address</Label>
                 <Input
                   id="address"
@@ -333,20 +325,20 @@ export default function BookingForm() {
                 />
               </div>
 
-              <div className="space-y-1">
-                <Label htmlFor="bookingAmount">Booking Amount</Label>
+              <div>
+                <Label htmlFor="bookingAmount">Payment Amount</Label>
                 <Input
                   id="bookingAmount"
                   name="bookingAmount"
                   type="number"
                   value={formData.bookingAmount}
                   onChange={handleChange}
-                  placeholder="Enter booking amount"
+                  placeholder="Enter amount you paid"
                   required
                 />
               </div>
 
-              <div className="space-y-1">
+              <div>
                 <Label htmlFor="referenceNumber">Reference Number</Label>
                 <Input
                   id="referenceNumber"
