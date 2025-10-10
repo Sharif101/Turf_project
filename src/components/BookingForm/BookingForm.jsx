@@ -319,9 +319,9 @@ export default function BookingForm({ bookedSlots = [] }) {
           <CardContent>
             <form
               onSubmit={handleSubmit}
-              className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+              className="grid grid-cols-1 md:grid-cols-2 gap-4"
             >
-              <div className="col-span-2">
+              <div className="md:col-span-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input
                   id="name"
@@ -354,11 +354,10 @@ export default function BookingForm({ bookedSlots = [] }) {
                   placeholder="you@example.com"
                   value={formData.email}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
-              <div className="col-span-2">
+              <div className="md:col-span-2">
                 <Label htmlFor="address">Address</Label>
                 <Input
                   id="address"
@@ -366,7 +365,6 @@ export default function BookingForm({ bookedSlots = [] }) {
                   placeholder="Enter your address"
                   value={formData.address}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -395,7 +393,7 @@ export default function BookingForm({ bookedSlots = [] }) {
                 />
               </div>
 
-              <div className="col-span-2 space-y-2">
+              <div className="md:col-span-2 space-y-2">
                 <Button
                   type="submit"
                   className="w-full bg-green-600 hover:bg-green-700 text-white"
