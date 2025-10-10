@@ -29,6 +29,7 @@ import { toast } from "react-toastify";
 export default function BookingForm() {
   const [selectedSport, setSelectedSport] = useState("");
   const [selectedSlot, setSelectedSlot] = useState(null);
+  const [slotPrice, setSlotPrice] = useState(0);
   const [date, setDate] = useState(new Date());
   const [step, setStep] = useState(1);
   const [formData, setFormData] = useState({
@@ -36,11 +37,11 @@ export default function BookingForm() {
     phone: "",
     email: "",
     address: "",
-    bookingAmount: "", // user-entered payment amount
+    bookingAmount: "",
     referenceNumber: "",
   });
 
-  // 🕒 Time Slots
+  // Time Slots
   const morningSlots = [
     "06:00 AM - 07:30 AM",
     "08:00 AM - 09:30 AM",
@@ -53,12 +54,32 @@ export default function BookingForm() {
     "10:00 PM - 11:30 PM",
   ];
 
-  // 💰 Total amount per sport
-  const getTotalAmount = (sport) => {
-    if (sport === "Football") return 2500;
-    if (sport === "Cricket") return 2000;
-    if (sport === "Badminton") return 1500;
-    return 0;
+  // Slot-based pricing per sport
+  const slotPricing = {
+    Football: { morning: 1500, afternoon: 2000, evening: 2500 },
+    Cricket: { morning: 1200, afternoon: 1600, evening: 2000 },
+    Badminton: { morning: 800, afternoon: 1000, evening: 1200 },
+  };
+
+  // ✅ Discount logic for Friday or Saturday (4000 tk fixed, 20% off = 3200)
+  const getDiscountedPrice = (basePrice) => {
+    const day = format(date, "EEEE");
+    if (day === "Friday" || day === "Saturday") {
+      return 4000 * 0.8;
+    }
+    return basePrice;
+  };
+
+  // When user selects a slot
+  const handleSlotSelect = (slotLabel, slotType) => {
+    if (!selectedSport) {
+      toast.error("Please select a sport first!");
+      return;
+    }
+    const basePrice = slotPricing[selectedSport]?.[slotType] || 0;
+    const finalPrice = getDiscountedPrice(basePrice);
+    setSelectedSlot(slotLabel);
+    setSlotPrice(finalPrice);
   };
 
   const handleBookNow = () => {
@@ -76,7 +97,7 @@ export default function BookingForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const totalAmount = getTotalAmount(selectedSport);
+    const totalAmount = slotPrice;
     const paymentAmount = Number(formData.bookingAmount);
     const dueAmount = totalAmount - paymentAmount;
 
@@ -109,6 +130,7 @@ export default function BookingForm() {
       setStep(1);
       setSelectedSlot(null);
       setSelectedSport("");
+      setSlotPrice(0);
       setFormData({
         name: "",
         phone: "",
@@ -168,7 +190,6 @@ export default function BookingForm() {
             <CardTitle>Select Sport, Date & Time Slot</CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Sport Selection */}
             <Select onValueChange={setSelectedSport}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Select Sport" />
@@ -223,19 +244,22 @@ export default function BookingForm() {
                   <TabsContent
                     key={label}
                     value={label}
-                    className="grid grid-cols-2 gap-2 mt-3"
+                    className="grid grid-cols-1 gap-2 mt-3"
                   >
                     {slots.map((slot) => (
                       <button
                         key={slot}
-                        onClick={() => setSelectedSlot(slot)}
+                        onClick={() => handleSlotSelect(slot, label)}
                         className={`rounded-md border text-sm p-2 transition ${
                           selectedSlot === slot
                             ? "bg-green-600 text-white"
                             : "border-gray-300 hover:bg-gray-100"
                         }`}
                       >
-                        {slot}
+                        {slot} • ৳
+                        {getDiscountedPrice(
+                          slotPricing[selectedSport]?.[label] || 0
+                        )}
                       </button>
                     ))}
                   </TabsContent>
@@ -243,13 +267,12 @@ export default function BookingForm() {
               </Tabs>
             </div>
 
-            {/* Book Button */}
             <Button
               onClick={handleBookNow}
               className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white"
             >
-              {selectedSport && selectedSlot
-                ? `Book ₹${getTotalAmount(selectedSport)} • ${format(
+              {selectedSlot
+                ? `Book ৳${slotPrice} • ${format(
                     date,
                     "MMM d"
                   )} • ${selectedSlot}`
@@ -270,20 +293,24 @@ export default function BookingForm() {
               {`${selectedSport} • ${format(date, "PPP")} • ${selectedSlot}`}
             </p>
             <p className="text-center text-green-600 font-medium mt-1">
-              Total Slot Amount: ₹{getTotalAmount(selectedSport)}
+              Total Slot Amount: ৳{slotPrice}
             </p>
           </CardHeader>
 
+          {/* ✅ Grid form layout with placeholders */}
           <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
+            <form
+              onSubmit={handleSubmit}
+              className="grid grid-cols-1 sm:grid-cols-2 gap-4"
+            >
+              <div className="col-span-1 sm:col-span-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input
                   id="name"
                   name="name"
+                  placeholder="Enter your full name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="Enter your name"
                   required
                 />
               </div>
@@ -293,9 +320,9 @@ export default function BookingForm() {
                 <Input
                   id="phone"
                   name="phone"
+                  placeholder="01XXXXXXXXX"
                   value={formData.phone}
                   onChange={handleChange}
-                  placeholder="Enter your phone number"
                   required
                 />
               </div>
@@ -306,21 +333,21 @@ export default function BookingForm() {
                   id="email"
                   type="email"
                   name="email"
+                  placeholder="you@example.com"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="Enter your email"
                   required
                 />
               </div>
 
-              <div>
+              <div className="col-span-1 sm:col-span-2">
                 <Label htmlFor="address">Address</Label>
                 <Input
                   id="address"
                   name="address"
+                  placeholder="Enter your address"
                   value={formData.address}
                   onChange={handleChange}
-                  placeholder="Enter your address"
                   required
                 />
               </div>
@@ -331,9 +358,9 @@ export default function BookingForm() {
                   id="bookingAmount"
                   name="bookingAmount"
                   type="number"
+                  placeholder="Enter paid amount"
                   value={formData.bookingAmount}
                   onChange={handleChange}
-                  placeholder="Enter amount you paid"
                   required
                 />
               </div>
@@ -343,28 +370,29 @@ export default function BookingForm() {
                 <Input
                   id="referenceNumber"
                   name="referenceNumber"
+                  placeholder="Bkash / Nagad / Rocket Ref"
                   value={formData.referenceNumber}
                   onChange={handleChange}
-                  placeholder="Transaction / Reference ID"
                   required
                 />
               </div>
 
-              <Button
-                type="submit"
-                className="w-full bg-green-600 hover:bg-green-700 text-white mt-3"
-              >
-                Submit Booking
-              </Button>
-
-              <Button
-                type="button"
-                variant="outline"
-                className="w-full mt-2"
-                onClick={() => setStep(1)}
-              >
-                Back
-              </Button>
+              <div className="col-span-1 sm:col-span-2 space-y-2">
+                <Button
+                  type="submit"
+                  className="w-full bg-green-600 hover:bg-green-700 text-white"
+                >
+                  Submit Booking
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={() => setStep(1)}
+                >
+                  Back
+                </Button>
+              </div>
             </form>
           </CardContent>
         </Card>
