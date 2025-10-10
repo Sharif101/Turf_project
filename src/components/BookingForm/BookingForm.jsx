@@ -22,11 +22,11 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { format } from "date-fns";
+import { format, isSameDay } from "date-fns";
 import Image from "next/image";
 import { toast } from "react-toastify";
 
-export default function BookingForm() {
+export default function BookingForm({ bookedSlots = [] }) {
   const [selectedSport, setSelectedSport] = useState("");
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [slotPrice, setSlotPrice] = useState(0);
@@ -54,32 +54,34 @@ export default function BookingForm() {
     "10:00 PM - 11:30 PM",
   ];
 
-  // Slot-based pricing per sport
+  // Slot pricing per sport
   const slotPricing = {
     Football: { morning: 1500, afternoon: 2000, evening: 2500 },
     Cricket: { morning: 1200, afternoon: 1600, evening: 2000 },
     Badminton: { morning: 800, afternoon: 1000, evening: 1200 },
   };
 
-  // ✅ Discount logic for Friday or Saturday (4000 tk fixed, 20% off = 3200)
-  const getDiscountedPrice = (basePrice) => {
+  // Get final slot price (20% discount on 4000 TK on Friday/Saturday)
+  const getDiscountedPrice = (slotType) => {
     const day = format(date, "EEEE");
     if (day === "Friday" || day === "Saturday") {
-      return 4000 * 0.8;
+      return 4000 * 0.8; // 20% off on 4000 = 3200
     }
-    return basePrice;
+    return slotPricing[selectedSport]?.[slotType] || 0;
   };
 
-  // When user selects a slot
   const handleSlotSelect = (slotLabel, slotType) => {
     if (!selectedSport) {
       toast.error("Please select a sport first!");
       return;
     }
-    const basePrice = slotPricing[selectedSport]?.[slotType] || 0;
-    const finalPrice = getDiscountedPrice(basePrice);
+    if (!date) {
+      toast.error("Please select a date first!");
+      return;
+    }
+
     setSelectedSlot(slotLabel);
-    setSlotPrice(finalPrice);
+    setSlotPrice(getDiscountedPrice(slotType));
   };
 
   const handleBookNow = () => {
@@ -103,7 +105,7 @@ export default function BookingForm() {
 
     const bookingDetails = {
       sport: selectedSport,
-      date: format(date, "PPP"),
+      date: date ? format(date, "PPP") : "",
       timeSlot: selectedSlot,
       name: formData.name,
       phone: formData.phone,
@@ -117,7 +119,7 @@ export default function BookingForm() {
 
     try {
       await fetch(
-        "https://script.google.com/macros/s/AKfycbzHOO0x9Gq5nxB2Uw2CRJZuc_y9eMVOpenk5FVrqlPsC9WYu4WK03sfWWpHsbbGNu3b/exec",
+        "https://script.google.com/macros/s/AKfycbxNyOOFSoEDEB0DcKhtEjVtcPdCpFV4_PRzZdM7AdF4yaC2uLvXQR27K6QRGVKsO70C/exec",
         {
           method: "POST",
           mode: "no-cors",
@@ -126,7 +128,7 @@ export default function BookingForm() {
         }
       );
 
-      toast.success(`Booking submitted successfully!`);
+      toast.success("Booking submitted successfully!");
       setStep(1);
       setSelectedSlot(null);
       setSelectedSport("");
@@ -141,7 +143,7 @@ export default function BookingForm() {
       });
     } catch (err) {
       console.error("Error submitting form:", err);
-      toast.error("Failed to submit booking. Try again!");
+      toast.error("Failed to submit booking.");
     }
   };
 
@@ -159,9 +161,7 @@ export default function BookingForm() {
           />
         </div>
         <CardHeader>
-          <CardTitle className="text-lg font-semibold">
-            SBR Football Turf
-          </CardTitle>
+          <CardTitle className="text-lg font-semibold">Mohakash Turf</CardTitle>
           <div className="flex items-center text-yellow-500 text-sm gap-1">
             <Star className="w-4 h-4" /> 4.8 (23 Reviews)
           </div>
@@ -169,7 +169,7 @@ export default function BookingForm() {
         <CardContent className="space-y-2 text-sm">
           <div className="flex items-center gap-2 text-gray-600">
             <MapPin className="w-4 h-4" />
-            <span>GTPL Road, Ahmedabad, Gujarat</span>
+            <span>Mohakash road, Bordmail, Borobanga, Demra, Dhaka</span>
           </div>
           <div className="flex items-center gap-2 text-gray-600">
             <Clock className="w-4 h-4" />
@@ -201,7 +201,7 @@ export default function BookingForm() {
               </SelectContent>
             </Select>
 
-            {/* Date Picker */}
+            {/* Calendar */}
             <div className="space-y-1">
               <p className="font-medium text-sm mb-1">Select Date</p>
               <Popover>
@@ -244,28 +244,47 @@ export default function BookingForm() {
                   <TabsContent
                     key={label}
                     value={label}
-                    className="grid grid-cols-1 gap-2 mt-3"
+                    className="grid gap-2 mt-3"
                   >
-                    {slots.map((slot) => (
-                      <button
-                        key={slot}
-                        onClick={() => handleSlotSelect(slot, label)}
-                        className={`rounded-md border text-sm p-2 transition ${
-                          selectedSlot === slot
-                            ? "bg-green-600 text-white"
-                            : "border-gray-300 hover:bg-gray-100"
-                        }`}
-                      >
-                        {slot} • ৳
-                        {getDiscountedPrice(
-                          slotPricing[selectedSport]?.[label] || 0
-                        )}
-                      </button>
-                    ))}
+                    {slots.map((slot) => {
+                      const isBooked = bookedSlots.some(
+                        (b) =>
+                          b?.sport === selectedSport &&
+                          b?.date === format(date, "MMMM do, yyyy") &&
+                          b?.timeSlot === slot
+                      );
+
+                      return (
+                        <button
+                          key={slot}
+                          onClick={() =>
+                            !isBooked && handleSlotSelect(slot, label)
+                          }
+                          disabled={isBooked}
+                          className={`rounded-md border text-sm p-2 transition ${
+                            isBooked
+                              ? "bg-gray-300 text-gray-600 cursor-not-allowed"
+                              : selectedSlot === slot
+                              ? "bg-green-600 text-white"
+                              : "border-gray-300 hover:bg-gray-100"
+                          }`}
+                        >
+                          {slot} • ৳{getDiscountedPrice(label)}
+                        </button>
+                      );
+                    })}
                   </TabsContent>
                 ))}
               </Tabs>
             </div>
+
+            {slotPrice > 0 && (
+              <p className="text-sm text-green-600 font-medium mt-1">
+                {["Friday", "Saturday"].includes(format(date, "EEEE"))
+                  ? `🎉 20% Discount Applied! Total: ৳${slotPrice}`
+                  : `Total: ৳${slotPrice}`}
+              </p>
+            )}
 
             <Button
               onClick={handleBookNow}
@@ -297,13 +316,12 @@ export default function BookingForm() {
             </p>
           </CardHeader>
 
-          {/* ✅ Grid form layout with placeholders */}
           <CardContent>
             <form
               onSubmit={handleSubmit}
               className="grid grid-cols-1 sm:grid-cols-2 gap-4"
             >
-              <div className="col-span-1 sm:col-span-2">
+              <div className="col-span-2">
                 <Label htmlFor="name">Full Name</Label>
                 <Input
                   id="name"
@@ -340,7 +358,7 @@ export default function BookingForm() {
                 />
               </div>
 
-              <div className="col-span-1 sm:col-span-2">
+              <div className="col-span-2">
                 <Label htmlFor="address">Address</Label>
                 <Input
                   id="address"
@@ -377,7 +395,7 @@ export default function BookingForm() {
                 />
               </div>
 
-              <div className="col-span-1 sm:col-span-2 space-y-2">
+              <div className="col-span-2 space-y-2">
                 <Button
                   type="submit"
                   className="w-full bg-green-600 hover:bg-green-700 text-white"
