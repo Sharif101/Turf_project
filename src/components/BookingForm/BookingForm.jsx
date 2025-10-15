@@ -284,6 +284,7 @@ export default function BookingForm({ bookedSlots = [], fetchBookedSlots }) {
                             b?.date === format(date, "MMMM do, yyyy") &&
                             b?.timeSlot === slot
                         );
+
                         return (
                           <button
                             key={slot}
@@ -291,15 +292,22 @@ export default function BookingForm({ bookedSlots = [], fetchBookedSlots }) {
                               !isBooked && handleSlotSelect(slot, label)
                             }
                             disabled={isBooked}
-                            className={`rounded-md border text-sm sm:text-base p-2 sm:p-3 transition ${
+                            className={`flex items-center justify-between rounded-md border text-sm sm:text-base p-2 sm:p-3 transition font-medium ${
                               isBooked
-                                ? "bg-gray-100 text-gray-400 cursor-not-allowed"
+                                ? "bg-red-50 text-red-600 border-red-200 cursor-not-allowed"
                                 : selectedSlot === slot
-                                ? "bg-green-600 text-white"
-                                : "border-gray-300 hover:bg-green-50"
+                                ? "bg-green-600 text-white border-green-600"
+                                : "border-gray-300 hover:bg-green-50 text-gray-800"
                             }`}
                           >
-                            {slot} • ৳{getDiscountedPrice(label)}
+                            <span>{slot}</span>
+                            {isBooked ? (
+                              <span className="text-red-500 font-semibold text-xs sm:text-sm">
+                                Booked
+                              </span>
+                            ) : (
+                              <span>৳{getDiscountedPrice(label)}</span>
+                            )}
                           </button>
                         );
                       })}
