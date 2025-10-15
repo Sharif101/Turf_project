@@ -26,5 +26,9 @@ export default async function Page() {
     console.error("Failed to fetch booked slots:", err);
   }
 
-  return <BookingForm bookedSlots={bookedSlots} />;
+  return (
+    <div className="light-theme min-h-screen">
+      <BookingForm bookedSlots={bookedSlots} />
+    </div>
+  );
 }
