@@ -1,34 +1,46 @@
+"use client"; // important to make it a Client Component
 import BookingForm from "@/components/BookingForm/BookingForm";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
-export default async function Page() {
-  let bookedSlots = [];
+export default function Page() {
+  const [bookedSlots, setBookedSlots] = useState([]);
+  const [loading, setLoading] = useState(false);
 
-  try {
-    const res = await fetch(
-      "https://script.google.com/macros/s/AKfycbxNyOOFSoEDEB0DcKhtEjVtcPdCpFV4_PRzZdM7AdF4yaC2uLvXQR27K6QRGVKsO70C/exec",
-      { cache: "no-store" }
-    );
+  const fetchBookedSlots = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(
+        "https://script.google.com/macros/s/AKfycbxNyOOFSoEDEB0DcKhtEjVtcPdCpFV4_PRzZdM7AdF4yaC2uLvXQR27K6QRGVKsO70C/exec",
+        { cache: "no-store" }
+      );
+      const data = await res.json();
 
-    const data = await res.json();
+      const slots = data
+        .map((item) => ({
+          sport: item.sport,
+          date: item.date,
+          timeSlot: item.timeSlot,
+        }))
+        .filter(Boolean);
 
-    // Map into objects with proper Date
-    bookedSlots = data
-      .map((item) => ({
-        sport: item.sport,
-        date: item.date,
-        timeSlot: item.timeSlot,
-      }))
-      .filter(Boolean);
+      setBookedSlots(slots);
+    } catch (err) {
+      console.error("Failed to fetch booked slots:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    console.log("Booked slots:", bookedSlots);
-  } catch (err) {
-    console.error("Failed to fetch booked slots:", err);
-  }
+  useEffect(() => {
+    fetchBookedSlots();
+  }, []);
 
   return (
     <div className="light-theme min-h-screen">
-      <BookingForm bookedSlots={bookedSlots} />
+      <BookingForm
+        bookedSlots={bookedSlots}
+        fetchBookedSlots={fetchBookedSlots}
+      />
     </div>
   );
 }

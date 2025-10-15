@@ -22,16 +22,17 @@ import {
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { format, isSameDay } from "date-fns";
+import { format } from "date-fns";
 import Image from "next/image";
 import { toast } from "react-toastify";
 
-export default function BookingForm({ bookedSlots = [] }) {
+export default function BookingForm({ bookedSlots = [], fetchBookedSlots }) {
   const [selectedSport, setSelectedSport] = useState("");
   const [selectedSlot, setSelectedSlot] = useState(null);
   const [slotPrice, setSlotPrice] = useState(0);
   const [date, setDate] = useState(new Date());
   const [step, setStep] = useState(1);
+  const [isSubmitting, setIsSubmitting] = useState(false); // loading state
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -98,6 +99,9 @@ export default function BookingForm({ bookedSlots = [] }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isSubmitting) return; // Prevent multiple clicks
+
+    setIsSubmitting(true);
 
     const totalAmount = slotPrice;
     const paymentAmount = Number(formData.bookingAmount);
@@ -129,6 +133,12 @@ export default function BookingForm({ bookedSlots = [] }) {
       );
 
       toast.success("Booking submitted successfully!");
+
+      // Refetch booked slots
+      if (fetchBookedSlots) {
+        fetchBookedSlots();
+      }
+
       setStep(1);
       setSelectedSlot(null);
       setSelectedSport("");
@@ -144,6 +154,8 @@ export default function BookingForm({ bookedSlots = [] }) {
     } catch (err) {
       console.error("Error submitting form:", err);
       toast.error("Failed to submit booking.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -397,8 +409,10 @@ export default function BookingForm({ bookedSlots = [] }) {
                 <Button
                   type="submit"
                   className="w-full bg-green-600 hover:bg-green-700 text-white"
+                  disabled={isSubmitting} // disable during submission
                 >
-                  Submit Booking
+                  {isSubmitting ? "Submitting..." : "Submit Booking"}{" "}
+                  {/* Loading text */}
                 </Button>
                 <Button
                   type="button"
