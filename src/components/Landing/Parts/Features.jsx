@@ -49,7 +49,7 @@ export default function Features() {
           <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">
             Why Choose{" "}
             <span className="bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent">
-              Our Turf
+              Our Mohakash Turf
             </span>
           </h2>
           <p className="text-gray-400 text-lg max-w-2xl mx-auto">

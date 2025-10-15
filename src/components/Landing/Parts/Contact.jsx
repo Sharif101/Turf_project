@@ -123,10 +123,19 @@ export default function Contact() {
               );
             })}
 
-            {/* Map placeholder */}
+            {/* Map section with your location */}
             <Card className="bg-gradient-to-br from-emerald-500/5 to-transparent border-emerald-500/20 overflow-hidden">
-              <div className="h-64 bg-gradient-to-br from-emerald-500/10 to-green-500/5 flex items-center justify-center">
-                <MapPin className="w-16 h-16 text-emerald-500/30" />
+              <div className="h-64 md:h-80 w-full">
+                <iframe
+                  title="Turf Location"
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3653.1684406844192!2d90.48379877602203!3d23.70567819049058!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3755b7007d96400d%3A0xb5721f9738f2cbfa!2sMohakash%20Turf!5e0!3m2!1sen!2sbd!4v1760522268691!5m2!1sen!2sbd"
+                  width="100%"
+                  height="100%"
+                  style={{ border: 0 }}
+                  allowFullScreen=""
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
               </div>
             </Card>
           </div>

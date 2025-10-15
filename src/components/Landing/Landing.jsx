@@ -14,7 +14,7 @@ export default function Landing() {
       <Features />
       <Sports />
       <Gallery />
-      <Pricing />
+      {/* <Pricing /> */}
       <Contact />
       <Footer />
     </div>
