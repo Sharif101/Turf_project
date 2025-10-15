@@ -32,7 +32,7 @@ export default function BookingForm({ bookedSlots = [], fetchBookedSlots }) {
   const [slotPrice, setSlotPrice] = useState(0);
   const [date, setDate] = useState(new Date());
   const [step, setStep] = useState(1);
-  const [isSubmitting, setIsSubmitting] = useState(false); // loading state
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -41,6 +41,10 @@ export default function BookingForm({ bookedSlots = [], fetchBookedSlots }) {
     bookingAmount: "",
     referenceNumber: "",
   });
+
+  // Invoice popup
+  const [lastBooking, setLastBooking] = useState(null);
+  const [showInvoice, setShowInvoice] = useState(false);
 
   // Time Slots
   const morningSlots = [
@@ -55,51 +59,39 @@ export default function BookingForm({ bookedSlots = [], fetchBookedSlots }) {
     "10:00 PM - 11:30 PM",
   ];
 
-  // Slot pricing per sport
+  // Slot pricing
   const slotPricing = {
     Football: { morning: 1500, afternoon: 2000, evening: 2500 },
     Cricket: { morning: 1200, afternoon: 1600, evening: 2000 },
     Badminton: { morning: 800, afternoon: 1000, evening: 1200 },
   };
 
-  // Get final slot price (20% discount on 4000 TK on Friday/Saturday)
   const getDiscountedPrice = (slotType) => {
     const day = format(date, "EEEE");
-    if (day === "Friday" || day === "Saturday") {
-      return 4000 * 0.8; // 20% off on 4000 = 3200
-    }
+    if (day === "Friday" || day === "Saturday") return 4000 * 0.8;
     return slotPricing[selectedSport]?.[slotType] || 0;
   };
 
   const handleSlotSelect = (slotLabel, slotType) => {
-    if (!selectedSport) {
-      toast.error("Please select a sport first!");
-      return;
-    }
-    if (!date) {
-      toast.error("Please select a date first!");
-      return;
-    }
-
+    if (!selectedSport) return toast.error("Please select a sport first!");
+    if (!date) return toast.error("Please select a date first!");
     setSelectedSlot(slotLabel);
     setSlotPrice(getDiscountedPrice(slotType));
   };
 
   const handleBookNow = () => {
     if (!selectedSport || !selectedSlot || !date) {
-      toast.error("Please select sport, date, and time slot!");
-      return;
+      return toast.error("Please select sport, date, and time slot!");
     }
     setStep(2);
   };
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isSubmitting) return; // Prevent multiple clicks
+    if (isSubmitting) return;
 
     setIsSubmitting(true);
 
@@ -134,10 +126,10 @@ export default function BookingForm({ bookedSlots = [], fetchBookedSlots }) {
 
       toast.success("Booking submitted successfully!");
 
-      // Refetch booked slots
-      if (fetchBookedSlots) {
-        fetchBookedSlots();
-      }
+      if (fetchBookedSlots) fetchBookedSlots();
+
+      setLastBooking(bookingDetails);
+      setShowInvoice(true);
 
       setStep(1);
       setSelectedSlot(null);
@@ -161,7 +153,7 @@ export default function BookingForm({ bookedSlots = [], fetchBookedSlots }) {
 
   return (
     <div className="max-w-md mx-auto p-4 space-y-6">
-      {/* Header */}
+      {/* Turf Header */}
       <Card className="overflow-hidden">
         <div className="relative w-full h-48">
           <Image
@@ -195,7 +187,7 @@ export default function BookingForm({ bookedSlots = [], fetchBookedSlots }) {
         </CardContent>
       </Card>
 
-      {/* Step 1 */}
+      {/* Step 1: Select sport/date/slot */}
       {step === 1 && (
         <Card>
           <CardHeader>
@@ -265,7 +257,6 @@ export default function BookingForm({ bookedSlots = [], fetchBookedSlots }) {
                           b?.date === format(date, "MMMM do, yyyy") &&
                           b?.timeSlot === slot
                       );
-
                       return (
                         <button
                           key={slot}
@@ -313,16 +304,17 @@ export default function BookingForm({ bookedSlots = [], fetchBookedSlots }) {
         </Card>
       )}
 
-      {/* Step 2 */}
+      {/* Step 2: Booking form */}
       {step === 2 && (
         <Card>
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-center">
               Complete Your Booking
             </CardTitle>
-            <p className="text-sm text-gray-600 text-center">
-              {`${selectedSport} • ${format(date, "PPP")} • ${selectedSlot}`}
-            </p>
+            <p className="text-sm text-gray-600 text-center">{`${selectedSport} • ${format(
+              date,
+              "PPP"
+            )} • ${selectedSlot}`}</p>
             <p className="text-center text-green-600 font-medium mt-1">
               Total Slot Amount: ৳{slotPrice}
             </p>
@@ -409,10 +401,9 @@ export default function BookingForm({ bookedSlots = [], fetchBookedSlots }) {
                 <Button
                   type="submit"
                   className="w-full bg-green-600 hover:bg-green-700 text-white"
-                  disabled={isSubmitting} // disable during submission
+                  disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Submitting..." : "Submit Booking"}{" "}
-                  {/* Loading text */}
+                  {isSubmitting ? "Submitting..." : "Submit Booking"}
                 </Button>
                 <Button
                   type="button"
@@ -426,6 +417,80 @@ export default function BookingForm({ bookedSlots = [], fetchBookedSlots }) {
             </form>
           </CardContent>
         </Card>
+      )}
+
+      {/* Booking Invoice Popup */}
+      {showInvoice && lastBooking && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md relative overflow-hidden">
+            {/* Header */}
+            <div className="bg-green-600 text-white py-4 px-6 flex justify-between items-center">
+              <h2 className="text-lg font-bold">Booking Confirmation</h2>
+              <button
+                onClick={() => setShowInvoice(false)}
+                className="text-white hover:text-gray-200 text-xl font-bold"
+              >
+                &times;
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-4">
+              <div className="grid grid-cols-2 gap-2">
+                <span className="font-semibold text-gray-600">Sport:</span>
+                <span className="text-gray-800">{lastBooking.sport}</span>
+
+                <span className="font-semibold text-gray-600">Slot Date:</span>
+                <span className="text-gray-800">{lastBooking.date}</span>
+
+                <span className="font-semibold text-gray-600">Slot Time:</span>
+                <span className="text-gray-800">{lastBooking.timeSlot}</span>
+
+                <span className="font-semibold text-gray-600">Name:</span>
+                <span className="text-gray-800">{lastBooking.name}</span>
+
+                <span className="font-semibold text-gray-600">Phone:</span>
+                <span className="text-gray-800">{lastBooking.phone}</span>
+
+                <span className="font-semibold text-gray-600">Email:</span>
+                <span className="text-gray-800">{lastBooking.email}</span>
+
+                <span className="font-semibold text-gray-600">
+                  Amount Paid:
+                </span>
+                <span className="text-gray-800">
+                  ৳{lastBooking.paymentAmount}
+                </span>
+
+                <span className="font-semibold text-gray-600">Total:</span>
+                <span className="text-gray-800">
+                  ৳{lastBooking.totalAmount}
+                </span>
+
+                <span className="font-semibold text-gray-600">Due:</span>
+                <span className="text-gray-800">৳{lastBooking.dueAmount}</span>
+
+                <span className="font-semibold text-gray-600">Reference:</span>
+                <span className="text-gray-800">
+                  {lastBooking.referenceNumber}
+                </span>
+              </div>
+
+              {/* Divider */}
+              <hr className="border-gray-200" />
+
+              {/* Footer / Close button */}
+              <div className="flex justify-end">
+                <button
+                  onClick={() => setShowInvoice(false)}
+                  className="px-6 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg font-semibold transition-all duration-200"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
