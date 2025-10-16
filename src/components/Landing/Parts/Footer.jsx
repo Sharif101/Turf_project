@@ -8,7 +8,7 @@ export default function Footer() {
           {/* Brand */}
           <div className="md:col-span-2">
             <h3 className="text-2xl font-bold bg-gradient-to-r from-emerald-400 to-green-400 bg-clip-text text-transparent mb-4">
-              Premium Mohakash Turf
+              Mohakash Turf
             </h3>
             <p className="text-gray-400 mb-4 leading-relaxed">
               Your destination for world-class football and cricket facilities.
@@ -72,7 +72,8 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="pt-8 border-t border-emerald-500/20 text-center text-gray-400 text-sm">
-          <p>© 2025 Premium Turf. All rights reserved.</p>
+          <p>© 2025 Mohakash Turf. All rights reserved.</p>
+          <p>Made by Sharif</p>
         </div>
       </div>
     </footer>
