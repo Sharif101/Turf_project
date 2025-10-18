@@ -35,6 +35,7 @@ export default function Contact() {
       <div className="absolute inset-0 bg-gradient-to-b from-black via-black to-emerald-950/20" />
 
       <div className="container mx-auto px-4 relative z-10">
+        {/* Section Heading */}
         <div className="text-center mb-16">
           <h2 className="text-4xl md:text-5xl font-bold mb-4 text-white">
             Get In{" "}
@@ -43,7 +44,7 @@ export default function Contact() {
             </span>
           </h2>
           <p className="text-gray-400 text-lg">
-            Have questions? We'd love to hear from you
+            Have questions? We&apos;d love to hear from you
           </p>
         </div>
 
@@ -72,6 +73,7 @@ export default function Contact() {
                     />
                   </div>
                 </div>
+
                 <div>
                   <label className="text-sm text-gray-400 mb-2 block">
                     Email
@@ -82,6 +84,7 @@ export default function Contact() {
                     className="bg-black/50 border-emerald-500/30 text-white placeholder:text-gray-500"
                   />
                 </div>
+
                 <div>
                   <label className="text-sm text-gray-400 mb-2 block">
                     Message
@@ -92,6 +95,7 @@ export default function Contact() {
                     className="bg-black/50 border-emerald-500/30 text-white placeholder:text-gray-500"
                   />
                 </div>
+
                 <Button className="w-full bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white">
                   Send Message
                 </Button>
@@ -123,7 +127,7 @@ export default function Contact() {
               );
             })}
 
-            {/* Map section with your location */}
+            {/* Google Map */}
             <Card className="bg-gradient-to-br from-emerald-500/5 to-transparent border-emerald-500/20 overflow-hidden">
               <div className="h-64 md:h-80 w-full">
                 <iframe

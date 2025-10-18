@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useMemo } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -9,127 +10,130 @@ export default function Dashboard() {
   const [customStartDate, setCustomStartDate] = useState("");
   const [customEndDate, setCustomEndDate] = useState("");
 
-  const allMatches = [
-    {
-      id: 1,
-      team1: "Team Alpha",
-      team2: "Team Beta",
-      score: "3-2",
-      date: "2025-10-15",
-      status: "Completed",
-      revenue: 1500,
-    },
-    {
-      id: 2,
-      team1: "Team Gamma",
-      team2: "Team Delta",
-      score: "1-1",
-      date: "2025-10-14",
-      status: "Completed",
-      revenue: 1200,
-    },
-    {
-      id: 3,
-      team1: "Team Epsilon",
-      team2: "Team Zeta",
-      score: "2-1",
-      date: "2025-10-12",
-      status: "Completed",
-      revenue: 1800,
-    },
-    {
-      id: 4,
-      team1: "Team Alpha",
-      team2: "Team Gamma",
-      score: "4-0",
-      date: "2025-10-10",
-      status: "Completed",
-      revenue: 2000,
-    },
-    {
-      id: 5,
-      team1: "Team Beta",
-      team2: "Team Delta",
-      score: "2-2",
-      date: "2025-10-08",
-      status: "Completed",
-      revenue: 1600,
-    },
-    {
-      id: 6,
-      team1: "Team Zeta",
-      team2: "Team Alpha",
-      score: "1-3",
-      date: "2025-09-28",
-      status: "Completed",
-      revenue: 1400,
-    },
-    {
-      id: 7,
-      team1: "Team Gamma",
-      team2: "Team Epsilon",
-      score: "3-1",
-      date: "2025-09-25",
-      status: "Completed",
-      revenue: 1700,
-    },
-    {
-      id: 8,
-      team1: "Team Delta",
-      team2: "Team Beta",
-      score: "0-2",
-      date: "2025-09-20",
-      status: "Completed",
-      revenue: 1300,
-    },
-    {
-      id: 9,
-      team1: "Team Alpha",
-      team2: "Team Zeta",
-      score: "2-1",
-      date: "2025-09-15",
-      status: "Completed",
-      revenue: 1900,
-    },
-    {
-      id: 10,
-      team1: "Team Epsilon",
-      team2: "Team Gamma",
-      score: "-",
-      date: "2025-10-18",
-      status: "Upcoming",
-      revenue: 0,
-    },
-    {
-      id: 11,
-      team1: "Team Beta",
-      team2: "Team Alpha",
-      score: "-",
-      date: "2025-10-20",
-      status: "Upcoming",
-      revenue: 0,
-    },
-  ];
+  // ✅ Memoized to avoid dependency warnings
+  const allMatches = useMemo(
+    () => [
+      {
+        id: 1,
+        team1: "Team Alpha",
+        team2: "Team Beta",
+        score: "3-2",
+        date: "2025-10-15",
+        status: "Completed",
+        revenue: 1500,
+      },
+      {
+        id: 2,
+        team1: "Team Gamma",
+        team2: "Team Delta",
+        score: "1-1",
+        date: "2025-10-14",
+        status: "Completed",
+        revenue: 1200,
+      },
+      {
+        id: 3,
+        team1: "Team Epsilon",
+        team2: "Team Zeta",
+        score: "2-1",
+        date: "2025-10-12",
+        status: "Completed",
+        revenue: 1800,
+      },
+      {
+        id: 4,
+        team1: "Team Alpha",
+        team2: "Team Gamma",
+        score: "4-0",
+        date: "2025-10-10",
+        status: "Completed",
+        revenue: 2000,
+      },
+      {
+        id: 5,
+        team1: "Team Beta",
+        team2: "Team Delta",
+        score: "2-2",
+        date: "2025-10-08",
+        status: "Completed",
+        revenue: 1600,
+      },
+      {
+        id: 6,
+        team1: "Team Zeta",
+        team2: "Team Alpha",
+        score: "1-3",
+        date: "2025-09-28",
+        status: "Completed",
+        revenue: 1400,
+      },
+      {
+        id: 7,
+        team1: "Team Gamma",
+        team2: "Team Epsilon",
+        score: "3-1",
+        date: "2025-09-25",
+        status: "Completed",
+        revenue: 1700,
+      },
+      {
+        id: 8,
+        team1: "Team Delta",
+        team2: "Team Beta",
+        score: "0-2",
+        date: "2025-09-20",
+        status: "Completed",
+        revenue: 1300,
+      },
+      {
+        id: 9,
+        team1: "Team Alpha",
+        team2: "Team Zeta",
+        score: "2-1",
+        date: "2025-09-15",
+        status: "Completed",
+        revenue: 1900,
+      },
+      {
+        id: 10,
+        team1: "Team Epsilon",
+        team2: "Team Gamma",
+        score: "-",
+        date: "2025-10-18",
+        status: "Upcoming",
+        revenue: 0,
+      },
+      {
+        id: 11,
+        team1: "Team Beta",
+        team2: "Team Alpha",
+        score: "-",
+        date: "2025-10-20",
+        status: "Upcoming",
+        revenue: 0,
+      },
+    ],
+    []
+  );
 
+  // 📅 Date range helper
   const getDateRanges = () => {
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
 
-    // This week (last 7 days)
     const thisWeekStart = new Date(now);
     thisWeekStart.setDate(now.getDate() - 7);
 
-    // This month
     const thisMonthStart = new Date(currentYear, currentMonth, 1);
 
-    // Last month
     const lastMonthStart = new Date(currentYear, currentMonth - 1, 1);
     const lastMonthEnd = new Date(currentYear, currentMonth, 0);
 
     return { thisWeekStart, thisMonthStart, lastMonthStart, lastMonthEnd, now };
   };
 
+  // 🔍 Filtered matches by date
   const filteredMatches = useMemo(() => {
     const { thisWeekStart, thisMonthStart, lastMonthStart, lastMonthEnd, now } =
       getDateRanges();
@@ -157,6 +161,7 @@ export default function Dashboard() {
     });
   }, [dateFilter, customStartDate, customEndDate, allMatches]);
 
+  // 📊 Stats summary
   const stats = useMemo(() => {
     const { thisMonthStart, now } = getDateRanges();
 
@@ -176,6 +181,7 @@ export default function Dashboard() {
         m.status === "Completed"
       );
     });
+
     const thisMonthRevenue = thisMonthMatches.reduce(
       (sum, m) => sum + m.revenue,
       0
@@ -184,6 +190,7 @@ export default function Dashboard() {
     const allCompletedMatches = allMatches.filter(
       (m) => m.status === "Completed"
     );
+
     const allTimeRevenue = allCompletedMatches.reduce(
       (sum, m) => sum + m.revenue,
       0
@@ -223,63 +230,38 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div>
         <h2 className="text-3xl font-bold text-gray-900">Dashboard</h2>
         <p className="text-gray-500 mt-1">
-          Welcome back! Here's what's happening today.
+          Welcome back! Here&apos;s what&apos;s happening today.
         </p>
       </div>
 
+      {/* Date Filter */}
       <Card className="p-6 bg-white border-gray-200">
         <h3 className="text-lg font-semibold text-gray-900 mb-4">
           Filter by Date
         </h3>
         <div className="flex flex-wrap gap-3 mb-4">
-          <Button
-            variant={dateFilter === "all" ? "default" : "outline"}
-            onClick={() => setDateFilter("all")}
-            className={
-              dateFilter === "all" ? "bg-blue-600 hover:bg-blue-700" : ""
-            }
-          >
-            All Time
-          </Button>
-          <Button
-            variant={dateFilter === "week" ? "default" : "outline"}
-            onClick={() => setDateFilter("week")}
-            className={
-              dateFilter === "week" ? "bg-blue-600 hover:bg-blue-700" : ""
-            }
-          >
-            This Week
-          </Button>
-          <Button
-            variant={dateFilter === "month" ? "default" : "outline"}
-            onClick={() => setDateFilter("month")}
-            className={
-              dateFilter === "month" ? "bg-blue-600 hover:bg-blue-700" : ""
-            }
-          >
-            This Month
-          </Button>
-          <Button
-            variant={dateFilter === "lastMonth" ? "default" : "outline"}
-            onClick={() => setDateFilter("lastMonth")}
-            className={
-              dateFilter === "lastMonth" ? "bg-blue-600 hover:bg-blue-700" : ""
-            }
-          >
-            Last Month
-          </Button>
-          <Button
-            variant={dateFilter === "custom" ? "default" : "outline"}
-            onClick={() => setDateFilter("custom")}
-            className={
-              dateFilter === "custom" ? "bg-blue-600 hover:bg-blue-700" : ""
-            }
-          >
-            Custom Range
-          </Button>
+          {[
+            { key: "all", label: "All Time" },
+            { key: "week", label: "This Week" },
+            { key: "month", label: "This Month" },
+            { key: "lastMonth", label: "Last Month" },
+            { key: "custom", label: "Custom Range" },
+          ].map((f) => (
+            <Button
+              key={f.key}
+              variant={dateFilter === f.key ? "default" : "outline"}
+              onClick={() => setDateFilter(f.key)}
+              className={
+                dateFilter === f.key ? "bg-blue-600 hover:bg-blue-700" : ""
+              }
+            >
+              {f.label}
+            </Button>
+          ))}
         </div>
 
         {dateFilter === "custom" && (
@@ -310,7 +292,7 @@ export default function Dashboard() {
         )}
       </Card>
 
-      {/* Stats Grid */}
+      {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {stats.map((stat, index) => {
           const Icon = stat.icon;
@@ -335,6 +317,7 @@ export default function Dashboard() {
         })}
       </div>
 
+      {/* Match History */}
       <Card className="p-6 bg-white border-gray-200">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-xl font-bold text-gray-900">
@@ -379,7 +362,7 @@ export default function Dashboard() {
             ))
           ) : (
             <p className="text-center text-gray-500 py-8">
-              No matches found for the selected date range
+              No matches found for the selected date range.
             </p>
           )}
         </div>
