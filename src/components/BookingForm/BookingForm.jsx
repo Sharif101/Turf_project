@@ -660,6 +660,43 @@ export default function BookingForm({
                         Payment Information
                       </h3>
 
+                      {/* Payment Numbers */}
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        <div className="bg-gradient-to-br from-pink-50 to-rose-50 border-2 border-pink-200 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-8 h-8 bg-pink-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                              bK
+                            </div>
+                            <span className="font-semibold text-gray-900 text-sm">
+                              Bkash
+                            </span>
+                          </div>
+                          <div className="font-mono font-bold text-pink-600 text-lg">
+                            01234567890
+                          </div>
+                          <p className="text-xs text-gray-600 mt-1">
+                            Send Money
+                          </p>
+                        </div>
+
+                        <div className="bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-200 rounded-lg p-4">
+                          <div className="flex items-center gap-2 mb-2">
+                            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                              N
+                            </div>
+                            <span className="font-semibold text-gray-900 text-sm">
+                              Nagad
+                            </span>
+                          </div>
+                          <div className="font-mono font-bold text-orange-600 text-lg">
+                            01234567890
+                          </div>
+                          <p className="text-xs text-gray-600 mt-1">
+                            Send Money
+                          </p>
+                        </div>
+                      </div>
+
                       <div className="grid sm:grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label
