@@ -1,5 +1,6 @@
 import { ToastContainer } from "react-toastify";
 import "./globals.css";
+import WhatsAppButton from "@/components/WhatApp/WhatsAppButton";
 
 export const metadata = {
   title: "Create Next App",
@@ -15,6 +16,7 @@ export default function RootLayout({ children }) {
         data-gr-ext-installed=""
       >
         {children}
+        <WhatsAppButton />
         <ToastContainer />
       </body>
     </html>
