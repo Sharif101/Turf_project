@@ -54,6 +54,7 @@ export default function BookingForm({
     address: "",
     bookingAmount: "",
     referenceNumber: "",
+    paymentMethod: "",
   });
 
   const [lastBooking, setLastBooking] = useState(null);
@@ -104,6 +105,11 @@ export default function BookingForm({
     e.preventDefault();
     if (isSubmitting) return;
 
+    if (!formData.paymentMethod) {
+      toast.error("Please select a payment method!");
+      return;
+    }
+
     setIsSubmitting(true);
 
     const totalAmount = slotPrice;
@@ -122,6 +128,7 @@ export default function BookingForm({
       totalAmount,
       dueAmount,
       referenceNumber: formData.referenceNumber,
+      paymentMethod: formData.paymentMethod,
     };
 
     try {
@@ -153,6 +160,7 @@ export default function BookingForm({
         address: "",
         bookingAmount: "",
         referenceNumber: "",
+        paymentMethod: "",
       });
     } catch (err) {
       console.error("Error submitting form:", err);
@@ -660,41 +668,135 @@ export default function BookingForm({
                         Payment Information
                       </h3>
 
-                      {/* Payment Numbers */}
-                      <div className="grid sm:grid-cols-2 gap-3">
-                        <div className="bg-gradient-to-br from-pink-50 to-rose-50 border-2 border-pink-200 rounded-lg p-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="w-8 h-8 bg-pink-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                              bK
+                      {/* Payment Method Selection */}
+                      <div className="space-y-3">
+                        <Label className="text-sm font-medium text-gray-700">
+                          Select Payment Method *
+                        </Label>
+                        <div className="grid sm:grid-cols-2 gap-3">
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setFormData({
+                                ...formData,
+                                paymentMethod: "Bkash",
+                              })
+                            }
+                            className={`bg-gradient-to-br from-pink-50 to-rose-50 border-2 rounded-lg p-4 transition-all duration-200 ${
+                              formData.paymentMethod === "Bkash"
+                                ? "border-pink-500 ring-2 ring-pink-200 shadow-lg"
+                                : "border-pink-200 hover:border-pink-400"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-pink-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                                  bK
+                                </div>
+                                <span className="font-semibold text-gray-900 text-sm">
+                                  Bkash
+                                </span>
+                              </div>
+                              <div
+                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                                  formData.paymentMethod === "Bkash"
+                                    ? "border-pink-500 bg-pink-500"
+                                    : "border-gray-300"
+                                }`}
+                              >
+                                {formData.paymentMethod === "Bkash" && (
+                                  <CheckCircle2 className="w-4 h-4 text-white" />
+                                )}
+                              </div>
                             </div>
-                            <span className="font-semibold text-gray-900 text-sm">
-                              Bkash
-                            </span>
-                          </div>
-                          <div className="font-mono font-bold text-pink-600 text-lg">
-                            01234567890
-                          </div>
-                          <p className="text-xs text-gray-600 mt-1">
-                            Send Money
-                          </p>
+                            <div className="font-mono font-bold text-pink-600 text-lg">
+                              01234567890
+                            </div>
+                            <p className="text-xs text-gray-600 mt-1">
+                              Send Money
+                            </p>
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setFormData({
+                                ...formData,
+                                paymentMethod: "Nagad",
+                              })
+                            }
+                            className={`bg-gradient-to-br from-orange-50 to-amber-50 border-2 rounded-lg p-4 transition-all duration-200 ${
+                              formData.paymentMethod === "Nagad"
+                                ? "border-orange-500 ring-2 ring-orange-200 shadow-lg"
+                                : "border-orange-200 hover:border-orange-400"
+                            }`}
+                          >
+                            <div className="flex items-center justify-between mb-2">
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                                  N
+                                </div>
+                                <span className="font-semibold text-gray-900 text-sm">
+                                  Nagad
+                                </span>
+                              </div>
+                              <div
+                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                                  formData.paymentMethod === "Nagad"
+                                    ? "border-orange-500 bg-orange-500"
+                                    : "border-gray-300"
+                                }`}
+                              >
+                                {formData.paymentMethod === "Nagad" && (
+                                  <CheckCircle2 className="w-4 h-4 text-white" />
+                                )}
+                              </div>
+                            </div>
+                            <div className="font-mono font-bold text-orange-600 text-lg">
+                              01234567890
+                            </div>
+                            <p className="text-xs text-gray-600 mt-1">
+                              Send Money
+                            </p>
+                          </button>
                         </div>
 
-                        <div className="bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-200 rounded-lg p-4">
-                          <div className="flex items-center gap-2 mb-2">
-                            <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                              N
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setFormData({ ...formData, paymentMethod: "Other" })
+                          }
+                          className={`w-full bg-gradient-to-br from-gray-50 to-slate-50 border-2 rounded-lg p-4 transition-all duration-200 flex items-center justify-between ${
+                            formData.paymentMethod === "Other"
+                              ? "border-gray-500 ring-2 ring-gray-200 shadow-lg"
+                              : "border-gray-200 hover:border-gray-400"
+                          }`}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-gray-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                              💳
                             </div>
-                            <span className="font-semibold text-gray-900 text-sm">
-                              Nagad
-                            </span>
+                            <div className="text-left">
+                              <span className="font-semibold text-gray-900 text-sm block">
+                                Other Payment Method
+                              </span>
+                              <p className="text-xs text-gray-600">
+                                Rocket, Cash, or Other
+                              </p>
+                            </div>
                           </div>
-                          <div className="font-mono font-bold text-orange-600 text-lg">
-                            01234567890
+                          <div
+                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                              formData.paymentMethod === "Other"
+                                ? "border-gray-500 bg-gray-500"
+                                : "border-gray-300"
+                            }`}
+                          >
+                            {formData.paymentMethod === "Other" && (
+                              <CheckCircle2 className="w-4 h-4 text-white" />
+                            )}
                           </div>
-                          <p className="text-xs text-gray-600 mt-1">
-                            Send Money
-                          </p>
-                        </div>
+                        </button>
                       </div>
 
                       <div className="grid sm:grid-cols-2 gap-4">
@@ -925,6 +1027,12 @@ export default function BookingForm({
                     <span className="text-gray-700">Reference:</span>
                     <span className="font-mono font-semibold text-gray-900">
                       {lastBooking.referenceNumber}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-gray-700">Method:</span>
+                    <span className="font-semibold text-gray-900">
+                      {lastBooking.paymentMethod}
                     </span>
                   </div>
                 </div>
