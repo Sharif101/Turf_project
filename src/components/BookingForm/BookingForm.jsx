@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState } from "react";
+import { useState } from "react";
 import {
-  Calendar as CalendarIcon,
+  CalendarIcon,
   Clock,
   MapPin,
   Star,
@@ -14,6 +14,8 @@ import {
   CheckCircle2,
   ArrowLeft,
   Sparkles,
+  Copy,
+  Check,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -47,6 +49,7 @@ export default function BookingForm({
   const [date, setDate] = useState(new Date());
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [copiedNumber, setCopiedNumber] = useState(null);
   const [formData, setFormData] = useState({
     name: "",
     phone: "",
@@ -76,6 +79,13 @@ export default function BookingForm({
     Football: { morning: 1500, afternoon: 2000, evening: 2500 },
     Cricket: { morning: 1200, afternoon: 1600, evening: 2000 },
     Badminton: { morning: 800, afternoon: 1000, evening: 1200 },
+  };
+
+  const copyToClipboard = (text, label) => {
+    navigator.clipboard.writeText(text);
+    setCopiedNumber(label);
+    toast.success(`${label} number copied!`);
+    setTimeout(() => setCopiedNumber(null), 2000);
   };
 
   const getDiscountedPrice = (slotType) => {
@@ -347,7 +357,7 @@ export default function BookingForm({
                       <PopoverTrigger asChild>
                         <Button
                           variant="outline"
-                          className="w-full h-12 justify-start text-left font-normal border-2 hover:border-green-400 transition-colors"
+                          className="w-full h-12 justify-start text-left font-normal border-2 hover:border-green-400 transition-colors bg-transparent"
                         >
                           <CalendarIcon className="mr-2 h-5 w-5 text-green-600" />
                           {date ? (
@@ -668,135 +678,108 @@ export default function BookingForm({
                         Payment Information
                       </h3>
 
-                      {/* Payment Method Selection */}
                       <div className="space-y-3">
                         <Label className="text-sm font-medium text-gray-700">
-                          Select Payment Method *
+                          Send Money To:
                         </Label>
-                        <div className="grid sm:grid-cols-2 gap-3">
+                        <div className="grid sm:grid-cols-2 gap-2">
+                          {/* Bkash Number Card */}
                           <button
                             type="button"
                             onClick={() =>
-                              setFormData({
-                                ...formData,
-                                paymentMethod: "Bkash",
-                              })
+                              copyToClipboard("01234567890", "Bkash")
                             }
-                            className={`bg-gradient-to-br from-pink-50 to-rose-50 border-2 rounded-lg p-4 transition-all duration-200 ${
-                              formData.paymentMethod === "Bkash"
-                                ? "border-pink-500 ring-2 ring-pink-200 shadow-lg"
-                                : "border-pink-200 hover:border-pink-400"
-                            }`}
+                            className="bg-gradient-to-br from-pink-50 to-rose-50 border-2 border-pink-200 rounded-lg p-3 hover:border-pink-400 hover:shadow-md transition-all duration-200 text-left group"
                           >
-                            <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center justify-between mb-1">
                               <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-pink-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                                <div className="w-6 h-6 bg-pink-500 rounded flex items-center justify-center text-white font-bold text-xs">
                                   bK
                                 </div>
-                                <span className="font-semibold text-gray-900 text-sm">
+                                <span className="font-semibold text-gray-900 text-xs">
                                   Bkash
                                 </span>
                               </div>
-                              <div
-                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                                  formData.paymentMethod === "Bkash"
-                                    ? "border-pink-500 bg-pink-500"
-                                    : "border-gray-300"
-                                }`}
-                              >
-                                {formData.paymentMethod === "Bkash" && (
-                                  <CheckCircle2 className="w-4 h-4 text-white" />
-                                )}
-                              </div>
+                              {copiedNumber === "Bkash" ? (
+                                <Check className="w-4 h-4 text-green-600" />
+                              ) : (
+                                <Copy className="w-4 h-4 text-pink-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                              )}
                             </div>
-                            <div className="font-mono font-bold text-pink-600 text-lg">
+                            <div className="font-mono font-bold text-pink-600 text-sm">
                               01234567890
                             </div>
-                            <p className="text-xs text-gray-600 mt-1">
-                              Send Money
-                            </p>
                           </button>
 
+                          {/* Nagad Number Card */}
                           <button
                             type="button"
                             onClick={() =>
-                              setFormData({
-                                ...formData,
-                                paymentMethod: "Nagad",
-                              })
+                              copyToClipboard("01234567890", "Nagad")
                             }
-                            className={`bg-gradient-to-br from-orange-50 to-amber-50 border-2 rounded-lg p-4 transition-all duration-200 ${
-                              formData.paymentMethod === "Nagad"
-                                ? "border-orange-500 ring-2 ring-orange-200 shadow-lg"
-                                : "border-orange-200 hover:border-orange-400"
-                            }`}
+                            className="bg-gradient-to-br from-orange-50 to-amber-50 border-2 border-orange-200 rounded-lg p-3 hover:border-orange-400 hover:shadow-md transition-all duration-200 text-left group"
                           >
-                            <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center justify-between mb-1">
                               <div className="flex items-center gap-2">
-                                <div className="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
+                                <div className="w-6 h-6 bg-orange-500 rounded flex items-center justify-center text-white font-bold text-xs">
                                   N
                                 </div>
-                                <span className="font-semibold text-gray-900 text-sm">
+                                <span className="font-semibold text-gray-900 text-xs">
                                   Nagad
                                 </span>
                               </div>
-                              <div
-                                className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                                  formData.paymentMethod === "Nagad"
-                                    ? "border-orange-500 bg-orange-500"
-                                    : "border-gray-300"
-                                }`}
-                              >
-                                {formData.paymentMethod === "Nagad" && (
-                                  <CheckCircle2 className="w-4 h-4 text-white" />
-                                )}
-                              </div>
+                              {copiedNumber === "Nagad" ? (
+                                <Check className="w-4 h-4 text-green-600" />
+                              ) : (
+                                <Copy className="w-4 h-4 text-orange-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+                              )}
                             </div>
-                            <div className="font-mono font-bold text-orange-600 text-lg">
+                            <div className="font-mono font-bold text-orange-600 text-sm">
                               01234567890
                             </div>
-                            <p className="text-xs text-gray-600 mt-1">
-                              Send Money
-                            </p>
                           </button>
                         </div>
+                      </div>
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setFormData({ ...formData, paymentMethod: "Other" })
-                          }
-                          className={`w-full bg-gradient-to-br from-gray-50 to-slate-50 border-2 rounded-lg p-4 transition-all duration-200 flex items-center justify-between ${
-                            formData.paymentMethod === "Other"
-                              ? "border-gray-500 ring-2 ring-gray-200 shadow-lg"
-                              : "border-gray-200 hover:border-gray-400"
-                          }`}
-                        >
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-gray-500 rounded-lg flex items-center justify-center text-white font-bold text-sm">
-                              💳
-                            </div>
-                            <div className="text-left">
-                              <span className="font-semibold text-gray-900 text-sm block">
-                                Other Payment Method
+                      <div className="space-y-2">
+                        <Label className="text-sm font-medium text-gray-700">
+                          Select Payment Method *
+                        </Label>
+                        <div className="flex gap-3 flex-wrap">
+                          {[
+                            { value: "Bkash", label: "💳 Bkash" },
+                            { value: "Nagad", label: "💳 Nagad" },
+                            { value: "Other", label: "💳 Other" },
+                          ].map((option) => (
+                            <label
+                              key={option.value}
+                              className={`flex items-center gap-2 px-4 py-2 rounded-lg border-2 cursor-pointer transition-all duration-200 ${
+                                formData.paymentMethod === option.value
+                                  ? "border-green-600 bg-green-50"
+                                  : "border-gray-200 bg-white hover:border-green-400"
+                              }`}
+                            >
+                              <input
+                                type="radio"
+                                name="paymentMethod"
+                                value={option.value}
+                                checked={
+                                  formData.paymentMethod === option.value
+                                }
+                                onChange={(e) =>
+                                  setFormData({
+                                    ...formData,
+                                    paymentMethod: e.target.value,
+                                  })
+                                }
+                                className="w-4 h-4 cursor-pointer"
+                              />
+                              <span className="text-sm font-medium text-gray-700">
+                                {option.label}
                               </span>
-                              <p className="text-xs text-gray-600">
-                                Rocket, Cash, or Other
-                              </p>
-                            </div>
-                          </div>
-                          <div
-                            className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                              formData.paymentMethod === "Other"
-                                ? "border-gray-500 bg-gray-500"
-                                : "border-gray-300"
-                            }`}
-                          >
-                            {formData.paymentMethod === "Other" && (
-                              <CheckCircle2 className="w-4 h-4 text-white" />
-                            )}
-                          </div>
-                        </button>
+                            </label>
+                          ))}
+                        </div>
                       </div>
 
                       <div className="grid sm:grid-cols-2 gap-4">
