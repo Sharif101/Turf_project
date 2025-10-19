@@ -38,6 +38,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { format } from "date-fns";
 import { toast } from "react-toastify";
+import emailjs from "@emailjs/browser";
 
 export default function BookingForm({
   bookedSlots = [],
@@ -141,6 +142,7 @@ export default function BookingForm({
       paymentMethod: formData.paymentMethod,
     };
 
+    // inside your handleSubmit
     try {
       await fetch(
         "https://script.google.com/macros/s/AKfycbxNyOOFSoEDEB0DcKhtEjVtcPdCpFV4_PRzZdM7AdF4yaC2uLvXQR27K6QRGVKsO70C/exec",
@@ -151,6 +153,32 @@ export default function BookingForm({
           body: JSON.stringify(bookingDetails),
         }
       );
+
+      // Send invoice to user email if email exists
+      if (formData.email) {
+        const templateParams = {
+          user_name: formData.name,
+          user_email: formData.email,
+          booking_details: `
+            Sport: ${selectedSport}
+            Date: ${format(date, "PPP")}
+            Time: ${selectedSlot}
+            Total Amount: ৳${slotPrice}
+            Paid: ৳${formData.bookingAmount}
+            Due: ৳${slotPrice - Number(formData.bookingAmount)}
+            Payment Method: ${formData.paymentMethod}
+            Reference: ${formData.referenceNumber}
+          `,
+        };
+
+        await emailjs.send(
+          "service_6jw6e1e",
+          "template_fkrdp3q",
+          templateParams,
+          "WO8gFTDkjZ3VOI1oM"
+        );
+        toast.success("Invoice sent to your email!");
+      }
 
       toast.success("Booking submitted successfully!");
 
@@ -174,7 +202,7 @@ export default function BookingForm({
       });
     } catch (err) {
       console.error("Error submitting form:", err);
-      toast.error("Failed to submit booking.");
+      toast.error("Failed to submit booking or send invoice.");
     } finally {
       setIsSubmitting(false);
     }
