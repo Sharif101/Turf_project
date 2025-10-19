@@ -145,7 +145,7 @@ export default function BookingForm({
     // inside your handleSubmit
     try {
       await fetch(
-        "https://script.google.com/macros/s/AKfycbxNyOOFSoEDEB0DcKhtEjVtcPdCpFV4_PRzZdM7AdF4yaC2uLvXQR27K6QRGVKsO70C/exec",
+        "https://script.google.com/macros/s/AKfycbwHLb8w5xrnRTTTTgIUpJzL4r9qj8_okjBGLrf60oP7s-Sihj9cU0zs_EOvqM3Uqo17/exec",
         {
           method: "POST",
           mode: "no-cors",
