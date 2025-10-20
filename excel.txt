@@ -1,0 +1,127 @@
+// ✅ Submit a new booking
+function doPost(e) {
+ try {
+   const sheet = SpreadsheetApp.openById("1x_sj73J0jxsb1FMQnpC77ZFjmXoDDvJODBqMsb1tkiU")
+     .getSheetByName("Bookings");
+
+   // Parse the incoming JSON
+   const data = JSON.parse(e.postData.contents);
+
+   const totalAmount = Number(data.totalAmount) || 0;
+   const paymentAmount = Number(data.paymentAmount) || 0;
+   const dueAmount = totalAmount - paymentAmount;
+
+   // Prepare row to append
+   const newRow = [
+     new Date(),              // Timestamp
+     data.sport || "",
+     data.date || "",
+     data.timeSlot || "",
+     data.name || "",
+     data.phone || "",
+     data.email || "",
+     data.address || "",
+     paymentAmount,
+     data.referenceNumber || "",
+     totalAmount,
+     dueAmount,
+     "", // Payment Status
+     ""  // Match Status
+   ];
+
+   // Append the row
+   sheet.appendRow(newRow);
+
+   const lastRow = sheet.getLastRow();
+   const lastColumn = sheet.getLastColumn();
+   const range = sheet.getRange(lastRow, 1, 1, lastColumn);
+
+   // Format text alignment, font
+   range.setHorizontalAlignment("left");
+   range.setFontSize(10);
+   range.setFontWeight("normal");
+
+   // Format timestamp column
+   sheet.getRange(lastRow, 1).setNumberFormat("d/M/yyyy hh:mm:ss AM/PM");
+
+   // Apply dropdowns for Payment & Match Status
+   applyDropdownsToRow(sheet, lastRow);
+
+   return ContentService.createTextOutput(
+     JSON.stringify({ status: "success" })
+   ).setMimeType(ContentService.MimeType.JSON);
+
+ } catch (error) {
+   return ContentService.createTextOutput(
+     JSON.stringify({ status: "error", message: error.message })
+   ).setMimeType(ContentService.MimeType.JSON);
+ }
+}
+
+// ✅ Apply dropdowns to Payment & Match Status columns
+function applyDropdownsToRow(sheet, rowNumber) {
+ const paymentCol = 13; // Payment Status
+ const matchCol = 14;   // Match Status
+
+ const paymentOptions = ["Pending", "Done", "Cancel"];
+ const matchOptions = ["Pending", "Done", "Cancel"];
+
+ const paymentRule = SpreadsheetApp.newDataValidation()
+   .requireValueInList(paymentOptions, true)
+   .setAllowInvalid(false)
+   .build();
+
+ const matchRule = SpreadsheetApp.newDataValidation()
+   .requireValueInList(matchOptions, true)
+   .setAllowInvalid(false)
+   .build();
+
+ sheet.getRange(rowNumber, paymentCol).setDataValidation(paymentRule);
+ sheet.getRange(rowNumber, matchCol).setDataValidation(matchRule);
+}
+
+// ✅ Fetch booking data for Next.js calendar
+// Fetch only the relevant columns: Sport (Column2), Date (Column3), Time Slot (Column4)
+function doGet(e) {
+ try {
+   const sheet = SpreadsheetApp.openById("1x_sj73J0jxsb1FMQnpC77ZFjmXoDDvJODBqMsb1tkiU")
+     .getSheetByName("Bookings");
+
+   const data = sheet.getDataRange().getValues();
+   if (data.length <= 2) return ContentService.createTextOutput(JSON.stringify([]))
+     .setMimeType(ContentService.MimeType.JSON);
+
+   // Skip first 2 rows (empty + headers)
+   const bookings = data.slice(2).map((row) => ({
+     timestamp: row[0],          // Column1
+     sport: row[1],              // Column2
+     date: row[2],               // Column3
+     timeSlot: row[3],           // Column4
+     name: row[4],               // Column5
+     phone: row[5],              // Column6
+     email: row[6],              // Column7
+     address: row[7],            // Column8
+     paymentAmount: row[8],      // Column9
+     referenceNumber: row[9],    // Column10
+     totalAmount: row[10],       // Column11
+     dueAmount: row[11],         // Column12
+     paymentStatus: row[12],     // Column13
+     matchStatus: row[13],       // Column14
+   }));
+
+   return ContentService.createTextOutput(JSON.stringify(bookings))
+     .setMimeType(ContentService.MimeType.JSON);
+
+ } catch (err) {
+   return ContentService.createTextOutput(
+     JSON.stringify({ error: err.message })
+   ).setMimeType(ContentService.MimeType.JSON);
+ }
+}
+
+
+
+
+| ID | Name     | Email                                   | Phone      | Sport    | Date       | Time Slot | Payment | Total | Due |
+| -- | -------- | --------------------------------------- | ---------- | -------- | ---------- | --------- | ------- | ----- | --- |
+| 1  | John Doe | [john@email.com](mailto:john@email.com) | 0123456789 | Football | 2025-10-15 | 6PM–7PM   | 500     | 1000  | 500 |

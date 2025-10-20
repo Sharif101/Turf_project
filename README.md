@@ -1,36 +1,65 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+🏏 Turf Project Management Dashboard
+📘 Overview
 
-## Getting Started
+Turf Project Management is a web-based application built to manage turf bookings, schedules, and customer details efficiently.
+Currently, all booking form submissions are stored in Excel / Google Sheets, making it simple and lightweight to maintain without a dedicated backend.
 
-First, run the development server:
+⚙️ Features
 
-```bash
+✅ Turf booking form to collect customer details
+✅ Data automatically saved to Excel (Google Sheets)
+✅ Admin dashboard to view all bookings
+✅ Search and filter bookings by name, email, or sport
+✅ Responsive table and mobile card view
+✅ Clean UI using React, Tailwind CSS, and ShadCN/UI
+
+🧩 Tech Stack
+Layer Technology
+Frontend React / Next.js
+UI Components Tailwind CSS + ShadCN/UI
+Icons Lucide React
+Data Storage Excel / Google Sheets
+Hosting (optional) Vercel or Netlify
+🗂️ Data Flow
+
+User fills the booking form
+
+The form submission triggers a Google Apps Script (or backend endpoint)
+
+The data is appended to an Excel/Google Sheet
+
+The dashboard reads and displays this data in table format
+
+---
+
+---
+
+🚀 How to Run Locally
+
+Clone this repository
+
+git clone https://github.com/yourusername/turf-project.git
+cd turf-project
+
+Install dependencies
+
+npm install
+
+Run the development server
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open your browser and visit
+👉 http://localhost:3000
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+🔗 Connecting with Google Sheets
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+If you’re using Google Sheets as your database, follow these steps:
 
-## Learn More
+Go to Google Sheets
 
-To learn more about Next.js, take a look at the following resources:
+Create a new sheet and name it Bookings
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Open Extensions → Apps Script
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Paste your script that saves form data (example below):
