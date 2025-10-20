@@ -1,26 +1,21 @@
 "use client";
 
 import React, { useState } from "react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import { Eye, Trash2 } from "lucide-react";
 
 export default function Matches({ bookings, loading }) {
   const [searchTerm, setSearchTerm] = useState("");
-
-  const handleDelete = (id) => {
-    if (confirm("Are you sure you want to delete this booking?")) {
-      // For demo, remove from local state
-      bookings = bookings.filter((b) => b.id !== id);
-    }
-  };
-
-  const handleView = (booking) => {
-    alert(
-      `Booking Details:\nName: ${booking.name}\nEmail: ${booking.email}\nSport: ${booking.sport}\nDate: ${booking.date}`
-    );
-  };
 
   const filteredBookings = bookings.filter(
     (b) =>
@@ -31,6 +26,7 @@ export default function Matches({ bookings, loading }) {
 
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-3xl font-bold text-gray-900">Bookings</h2>
@@ -38,7 +34,9 @@ export default function Matches({ bookings, loading }) {
         </div>
       </div>
 
+      {/* Table Section */}
       <Card className="p-6 bg-white border-gray-200">
+        {/* Search Bar */}
         <div className="mb-6">
           <Input
             type="text"
@@ -49,85 +47,106 @@ export default function Matches({ bookings, loading }) {
           />
         </div>
 
+        {/* Content */}
         {loading ? (
           <p className="text-center py-12 text-gray-500">Loading bookings...</p>
         ) : filteredBookings.length === 0 ? (
           <p className="text-center py-12 text-gray-500">No bookings found</p>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-gray-200">
-                  <th className="py-2 px-4 text-left text-sm font-semibold">
-                    ID
-                  </th>
-                  <th className="py-2 px-4 text-left text-sm font-semibold">
-                    Name
-                  </th>
-                  <th className="py-2 px-4 text-left text-sm font-semibold">
-                    Email
-                  </th>
-                  <th className="py-2 px-4 text-left text-sm font-semibold">
-                    Phone
-                  </th>
-                  <th className="py-2 px-4 text-left text-sm font-semibold">
-                    Sport
-                  </th>
-                  <th className="py-2 px-4 text-left text-sm font-semibold">
-                    Date
-                  </th>
-                  <th className="py-2 px-4 text-left text-sm font-semibold">
-                    Time Slot
-                  </th>
-                  <th className="py-2 px-4 text-left text-sm font-semibold">
-                    Payment
-                  </th>
-                  <th className="py-2 px-4 text-left text-sm font-semibold">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {filteredBookings.map((b) => (
-                  <tr
-                    key={b.id}
-                    className="border-b border-gray-100 hover:bg-gray-50"
-                  >
-                    <td className="py-2 px-4 text-sm">{b.id}</td>
-                    <td className="py-2 px-4 text-sm">{b.name}</td>
-                    <td className="py-2 px-4 text-sm">{b.email}</td>
-                    <td className="py-2 px-4 text-sm">{b.phone}</td>
-                    <td className="py-2 px-4 text-sm">{b.sport}</td>
-                    <td className="py-2 px-4 text-sm">{b.date}</td>
-                    <td className="py-2 px-4 text-sm">{b.timeSlot}</td>
-                    <td className="py-2 px-4 text-sm">
-                      {b.paymentAmount} / {b.totalAmount} (Due: {b.dueAmount})
-                    </td>
-                    <td className="py-2 px-4 text-sm">
-                      <div className="flex gap-2">
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleView(b)}
-                          className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
-                        >
-                          <Eye size={18} />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleDelete(b.id)}
-                          className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                        >
-                          <Trash2 size={18} />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <>
+            {/* Desktop Table */}
+            <div className="hidden md:block overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>ID</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Phone</TableHead>
+                    <TableHead>Sport</TableHead>
+                    <TableHead>Date</TableHead>
+                    <TableHead>Time Slot</TableHead>
+                    <TableHead>Booking Amount</TableHead>
+                    <TableHead>Due Amount</TableHead>
+                    <TableHead>Total Amount</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {filteredBookings.map((b) => (
+                    <TableRow key={b.id}>
+                      <TableCell>{b.id}</TableCell>
+                      <TableCell>{b.name}</TableCell>
+                      <TableCell>{b.phone}</TableCell>
+                      <TableCell>{b.sport}</TableCell>
+                      <TableCell>{b.date}</TableCell>
+                      <TableCell>{b.timeSlot}</TableCell>
+                      <TableCell>{b.paymentAmount}</TableCell>
+                      <TableCell>{b.dueAmount}</TableCell>
+                      <TableCell>{b.totalAmount}</TableCell>
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+                          >
+                            <Eye size={18} />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                          >
+                            <Trash2 size={18} />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+
+            {/* Mobile Responsive Cards */}
+            <div className="grid grid-cols-1 gap-4 md:hidden">
+              {filteredBookings.map((b) => (
+                <Card
+                  key={b.id}
+                  className="p-4 border border-gray-200 bg-gray-50 shadow-sm"
+                >
+                  <div className="space-y-2 text-sm">
+                    <p>
+                      <strong>Name:</strong> {b.name}
+                    </p>
+                    <p>
+                      <strong>Email:</strong> {b.email}
+                    </p>
+                    <p>
+                      <strong>Phone:</strong> {b.phone}
+                    </p>
+                    <p>
+                      <strong>Sport:</strong> {b.sport}
+                    </p>
+                    <p>
+                      <strong>Date:</strong> {b.date}
+                    </p>
+                    <p>
+                      <strong>Time:</strong> {b.timeSlot}
+                    </p>
+                    <p>
+                      <strong>Booking Amount:</strong> {b.paymentAmount}
+                    </p>
+                    <p>
+                      <strong>Due Amount:</strong> {b.dueAmount}
+                    </p>
+                    <p>
+                      <strong>Total Amount:</strong> {b.totalAmount}
+                    </p>
+                  </div>
+                </Card>
+              ))}
+            </div>
+          </>
         )}
       </Card>
     </div>
